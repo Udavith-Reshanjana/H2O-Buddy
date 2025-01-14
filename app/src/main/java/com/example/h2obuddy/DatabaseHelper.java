@@ -28,6 +28,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_PASSWORD = "password";
     private static final String COLUMN_NAME = "name";
     private static final String COLUMN_DAILY_GOAL = "daily_goal";
+    private static final String COLUMN_REMINDER_INTERVAL = "reminder_interval";
 
     // Water Logs Table Columns
     private static final String COLUMN_DATE = "date";
@@ -45,7 +46,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + COLUMN_EMAIL + " TEXT UNIQUE, "
                 + COLUMN_PASSWORD + " TEXT, "
                 + COLUMN_NAME + " TEXT, "
-                + COLUMN_DAILY_GOAL + " INTEGER DEFAULT 2000)";
+                + COLUMN_DAILY_GOAL + " INTEGER DEFAULT 2000, "
+                + COLUMN_REMINDER_INTERVAL + " INTEGER DEFAULT 60)";
         db.execSQL(CREATE_USERS_TABLE);
 
         // Create Water Logs Table
@@ -73,6 +75,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_EMAIL, email);
         values.put(COLUMN_PASSWORD, password);
         values.put(COLUMN_DAILY_GOAL, dailyGoal);
+        values.put(COLUMN_REMINDER_INTERVAL, 60); // Default reminder interval
 
         long result = db.insert(TABLE_USERS, null, values);
         return result != -1;
@@ -163,6 +166,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return history;
     }
 
+    public int getReminderInterval(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        int interval = 60; // Default reminder interval in minutes
 
+        Cursor cursor = db.query(TABLE_USERS, new String[]{COLUMN_REMINDER_INTERVAL},
+                COLUMN_EMAIL + "=?", new String[]{email}, null, null, null);
+
+        if (cursor != null && cursor.moveToFirst()) {
+            interval = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_REMINDER_INTERVAL));
+            cursor.close();
+        }
+
+        return interval;
+    }
+
+    public boolean updateUserSettings(String email, int dailyGoal, int reminderInterval) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_DAILY_GOAL, dailyGoal);
+        values.put(COLUMN_REMINDER_INTERVAL, reminderInterval);
+
+        int rows = db.update(TABLE_USERS, values, COLUMN_EMAIL + "=?", new String[]{email});
+        return rows > 0;
+    }
 }
-
