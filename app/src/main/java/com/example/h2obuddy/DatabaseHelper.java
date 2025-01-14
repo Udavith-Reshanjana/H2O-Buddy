@@ -7,6 +7,9 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     // Database Name and Version
@@ -134,6 +137,32 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return dailyGoal;
     }
+
+    public List<String> getWeeklyHistory(String email) {
+        List<String> history = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Query to fetch weekly water intake history
+        Cursor cursor = db.rawQuery(
+                "SELECT " + COLUMN_DATE + ", SUM(" + COLUMN_AMOUNT + ") AS total " +
+                        "FROM " + TABLE_WATER_LOGS + " WHERE " + COLUMN_EMAIL + " = ? " +
+                        "GROUP BY " + COLUMN_DATE + " ORDER BY " + COLUMN_DATE + " DESC LIMIT 7",
+                new String[]{email}
+        );
+
+        // Process query results
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                String date = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DATE));
+                int total = cursor.getInt(cursor.getColumnIndexOrThrow("total"));
+                history.add(date + ": " + total + " ml");
+            }
+            cursor.close();
+        }
+
+        return history;
+    }
+
 
 }
 
