@@ -84,11 +84,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // Validate User Login
     public boolean validateUser(String email, String password) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(TABLE_USERS, new String[]{COLUMN_ID}, COLUMN_EMAIL + "=? AND " + COLUMN_PASSWORD + "=?",
-                new String[]{email, password}, null, null, null);
-        boolean isValid = cursor.getCount() > 0;
-        cursor.close();
-        return isValid;
+        Cursor cursor = null;
+        try {
+            cursor = db.query(TABLE_USERS, new String[]{COLUMN_ID}, COLUMN_EMAIL + "=? AND " + COLUMN_PASSWORD + "=?",
+                    new String[]{email, password}, null, null, null);
+            return cursor != null && cursor.getCount() > 0;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
     }
 
     // Insert Water Intake Log
@@ -106,14 +111,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // Get Daily Water Intake
     public int getDailyWaterIntake(String email, String date) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT SUM(" + COLUMN_AMOUNT + ") FROM " + TABLE_WATER_LOGS + " WHERE "
-                + COLUMN_EMAIL + "=? AND " + COLUMN_DATE + "= ?", new String[]{email, date});
-
+        Cursor cursor = null;
         int total = 0;
-        if (cursor.moveToFirst()) {
-            total = cursor.getInt(0);
+        try {
+            cursor = db.rawQuery("SELECT SUM(" + COLUMN_AMOUNT + ") FROM " + TABLE_WATER_LOGS + " WHERE "
+                    + COLUMN_EMAIL + "=? AND " + COLUMN_DATE + "= ?", new String[]{email, date});
+
+            if (cursor != null && cursor.moveToFirst()) {
+                total = cursor.getInt(0);
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
         }
-        cursor.close();
         return total;
     }
 
@@ -130,12 +141,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         int dailyGoal = 2000; // Default goal
 
-        Cursor cursor = db.query(TABLE_USERS, new String[]{COLUMN_DAILY_GOAL},
-                COLUMN_EMAIL + "=?", new String[]{email}, null, null, null);
+        Cursor cursor = null;
+        try {
+            cursor = db.query(TABLE_USERS, new String[]{COLUMN_DAILY_GOAL},
+                    COLUMN_EMAIL + "=?", new String[]{email}, null, null, null);
 
-        if (cursor != null && cursor.moveToFirst()) {
-            dailyGoal = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_DAILY_GOAL));
-            cursor.close();
+            if (cursor != null && cursor.moveToFirst()) {
+                dailyGoal = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_DAILY_GOAL));
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
         }
 
         return dailyGoal;
@@ -144,23 +161,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public List<String> getWeeklyHistory(String email) {
         List<String> history = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
 
-        // Query to fetch weekly water intake history
-        Cursor cursor = db.rawQuery(
-                "SELECT " + COLUMN_DATE + ", SUM(" + COLUMN_AMOUNT + ") AS total " +
-                        "FROM " + TABLE_WATER_LOGS + " WHERE " + COLUMN_EMAIL + " = ? " +
-                        "GROUP BY " + COLUMN_DATE + " ORDER BY " + COLUMN_DATE + " DESC LIMIT 7",
-                new String[]{email}
-        );
+        try {
+            // Query to fetch weekly water intake history
+            cursor = db.rawQuery(
+                    "SELECT " + COLUMN_DATE + ", SUM(" + COLUMN_AMOUNT + ") AS total " +
+                            "FROM " + TABLE_WATER_LOGS + " WHERE " + COLUMN_EMAIL + " = ? " +
+                            "GROUP BY " + COLUMN_DATE + " ORDER BY " + COLUMN_DATE + " DESC LIMIT 7",
+                    new String[]{email}
+            );
 
-        // Process query results
-        if (cursor != null) {
-            while (cursor.moveToNext()) {
-                String date = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DATE));
-                int total = cursor.getInt(cursor.getColumnIndexOrThrow("total"));
-                history.add(date + ": " + total + " ml");
+            // Process query results
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+                    String date = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DATE));
+                    int total = cursor.getInt(cursor.getColumnIndexOrThrow("total"));
+                    history.add(date + ": " + total + " ml");
+                }
             }
-            cursor.close();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
         }
 
         return history;
@@ -170,12 +193,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         int interval = 60; // Default reminder interval in minutes
 
-        Cursor cursor = db.query(TABLE_USERS, new String[]{COLUMN_REMINDER_INTERVAL},
-                COLUMN_EMAIL + "=?", new String[]{email}, null, null, null);
+        Cursor cursor = null;
+        try {
+            cursor = db.query(TABLE_USERS, new String[]{COLUMN_REMINDER_INTERVAL},
+                    COLUMN_EMAIL + "=?", new String[]{email}, null, null, null);
 
-        if (cursor != null && cursor.moveToFirst()) {
-            interval = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_REMINDER_INTERVAL));
-            cursor.close();
+            if (cursor != null && cursor.moveToFirst()) {
+                interval = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_REMINDER_INTERVAL));
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
         }
 
         return interval;
