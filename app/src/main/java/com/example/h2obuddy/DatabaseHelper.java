@@ -118,5 +118,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         + " WHERE " + COLUMN_EMAIL + "=? GROUP BY " + COLUMN_DATE + " ORDER BY " + COLUMN_DATE + " DESC LIMIT 7",
                 new String[]{email});
     }
+
+    // Add this method to DatabaseHelper
+    public int getDailyGoal(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        int dailyGoal = 2000; // Default goal
+
+        Cursor cursor = db.query(TABLE_USERS, new String[]{COLUMN_DAILY_GOAL},
+                COLUMN_EMAIL + "=?", new String[]{email}, null, null, null);
+
+        if (cursor != null && cursor.moveToFirst()) {
+            dailyGoal = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_DAILY_GOAL));
+            cursor.close();
+        }
+
+        return dailyGoal;
+    }
+
 }
 
