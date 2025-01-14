@@ -8,12 +8,19 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Login"
+        android:text="Sign Up"
         android:textSize="24sp"
         android:textStyle="bold"
         android:gravity="center"
         android:layout_gravity="center"
         android:marginBottom="24dp" />
+
+    <EditText
+        android:id="@+id/etName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Name"
+        android:padding="12dp" />
 
     <EditText
         android:id="@+id/etEmail"
@@ -32,17 +39,17 @@
         android:padding="12dp" />
 
     <Button
-        android:id="@+id/btnLogin"
+        android:id="@+id/btnSignup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Login"
+        android:text="Sign Up"
         android:layout_marginTop="16dp" />
 
     <TextView
-        android:id="@+id/tvSignup"
+        android:id="@+id/tvLogin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Don't have an account? Sign up"
+        android:text="Already have an account? Log in"
         android:textColor="@android:color/holo_blue_dark"
         android:layout_gravity="center"
         android:layout_marginTop="16dp" />
