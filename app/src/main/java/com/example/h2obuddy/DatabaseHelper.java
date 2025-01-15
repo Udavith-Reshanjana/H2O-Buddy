@@ -82,7 +82,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     // Validate User Login
-    public boolean validateUser(String email, String password) {
+    public boolean validateUser1(String email, String password) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = null;
         try {
@@ -95,6 +95,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
         }
     }
+
+    // Validate User Login and Return User ID
+    public int validateUser(String email, String password) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+        int userId = -1; // Default: user not found
+        try {
+            cursor = db.query(TABLE_USERS, new String[]{COLUMN_ID},
+                    COLUMN_EMAIL + "=? AND " + COLUMN_PASSWORD + "=?",
+                    new String[]{email, password}, null, null, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                userId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID));
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return userId;
+    }
+
 
     // Insert Water Intake Log
     public boolean insertWaterLog(String email, String date, int amount) {

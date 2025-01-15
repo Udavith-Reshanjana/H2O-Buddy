@@ -1,6 +1,5 @@
 package com.example.h2obuddy;
 
-
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -44,12 +43,17 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
 
-                // Validate user credentials
-                boolean isValid = databaseHelper.validateUser(email, password);
+                // Validate user credentials and get user ID
+                int userId = databaseHelper.validateUser(email, password);
 
-                if (isValid) {
+                if (userId != -1) {
                     Toast.makeText(MainActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
+
+                    // Pass user ID to HomeActivity
                     Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("USER_ID", userId);
+                    intent.putExtras(bundle);
                     startActivity(intent);
                     finish();
                 } else {
