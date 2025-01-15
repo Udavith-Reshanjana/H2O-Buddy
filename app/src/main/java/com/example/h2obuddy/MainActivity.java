@@ -7,12 +7,14 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
     private EditText etEmail, etPassword;
-    private Button btnLogin, btnSignup;
+    private Button btnLogin;
+    private TextView btnSignup;
     private DatabaseHelper databaseHelper;
 
     @Override
@@ -24,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
-        btnSignup = findViewById(R.id.btnSignup);
+        btnSignup = findViewById(R.id.tvSignup);
 
         // Initialize DatabaseHelper
         databaseHelper = new DatabaseHelper(this);
