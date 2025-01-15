@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -13,7 +14,7 @@
         android:textStyle="bold"
         android:gravity="center"
         android:layout_gravity="center"
-        android:marginBottom="24dp" />
+        android:layout_marginBottom="24dp" />
 
     <EditText
         android:id="@+id/etName"
@@ -43,7 +44,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Sign Up"
-        android:layout_marginTop="16dp" />
+        android:layout_marginTop="16dp"
+        android:onClick = "onCLick"
+        />
 
     <TextView
         android:id="@+id/tvLogin"
