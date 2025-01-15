@@ -41,7 +41,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         // Create Users Table
-        String CREATE_USERS_TABLE = "CREATE TABLE " + TABLE_USERS + " ("
+        String CREATE_USERS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_USERS + " ("
                 + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + COLUMN_EMAIL + " TEXT UNIQUE, "
                 + COLUMN_PASSWORD + " TEXT, "
@@ -51,7 +51,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_USERS_TABLE);
 
         // Create Water Logs Table
-        String CREATE_WATER_LOGS_TABLE = "CREATE TABLE " + TABLE_WATER_LOGS + " ("
+        String CREATE_WATER_LOGS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_WATER_LOGS + " ("
                 + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + COLUMN_DATE + " TEXT, "
                 + COLUMN_AMOUNT + " INTEGER, "
