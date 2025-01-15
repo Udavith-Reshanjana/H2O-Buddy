@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -15,7 +16,7 @@
         android:textStyle="bold"
         android:gravity="center"
         android:layout_gravity="center"
-        android:marginBottom="16dp" />
+        android:layout_marginBottom="16dp" />
 
     <!-- Daily Goal -->
     <TextView
@@ -58,7 +59,9 @@
         android:layout_marginBottom="8dp"
         android:backgroundTint="@color/purple_500"
         android:textColor="@android:color/white"
-        android:contentDescription="Add 250 ml of water" />
+        android:contentDescription="Add 250 ml of water"
+        android:onClick = "addWaterIntake"
+        />
 
     <Button
         android:id="@+id/btnAdd500"
@@ -67,6 +70,7 @@
         android:text="+500 ml"
         android:backgroundTint="@color/teal_200"
         android:textColor="@android:color/white"
-        android:contentDescription="Add 500 ml of water" />
+        android:contentDescription="Add 500 ml of water"
+        android:onClick = "addWaterIntake"/>
 
 </LinearLayout>

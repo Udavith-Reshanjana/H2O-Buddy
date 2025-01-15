@@ -1,18 +1,19 @@
 package com.example.h2obuddy;
 
-
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
     private EditText etEmail, etPassword;
-    private Button btnLogin, btnSignup;
+    private Button btnLogin;
+    private TextView btnSignup;
     private DatabaseHelper databaseHelper;
 
     @Override
@@ -24,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
-        btnSignup = findViewById(R.id.btnSignup);
+        btnSignup = findViewById(R.id.tvSignup);
 
         // Initialize DatabaseHelper
         databaseHelper = new DatabaseHelper(this);
@@ -42,12 +43,17 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
 
-                // Validate user credentials
-                boolean isValid = databaseHelper.validateUser(email, password);
+                // Validate user credentials and get user ID
+                int userId = databaseHelper.validateUser(email, password);
 
-                if (isValid) {
+                if (userId != -1) {
                     Toast.makeText(MainActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
+
+                    // Pass user ID to HomeActivity
                     Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("USER_ID", userId);
+                    intent.putExtras(bundle);
                     startActivity(intent);
                     finish();
                 } else {
