@@ -240,4 +240,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         int rows = db.update(TABLE_USERS, values, COLUMN_EMAIL + "=?", new String[]{email});
         return rows > 0;
     }
+
+    public String getUserEmailById(int userId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+        String email = null;
+
+        try {
+            cursor = db.query(TABLE_USERS, new String[]{COLUMN_EMAIL},
+                    COLUMN_ID + "=?", new String[]{String.valueOf(userId)},
+                    null, null, null);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                email = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EMAIL));
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+
+        return email;
+    }
+
 }
