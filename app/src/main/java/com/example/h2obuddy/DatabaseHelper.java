@@ -75,7 +75,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    // Insert User
+    // ====================== User Management ====================== //
+
     public boolean insertUser(String name, String email, String password, int dailyGoal) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -83,159 +84,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_EMAIL, email);
         values.put(COLUMN_PASSWORD, password);
         values.put(COLUMN_DAILY_GOAL, dailyGoal);
-        values.put(COLUMN_REMINDER_INTERVAL, 60); // Default reminder interval
 
         long result = db.insert(TABLE_USERS, null, values);
         return result != -1;
     }
 
-    // Validate User Login
-    public boolean validateUser1(String email, String password) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = null;
-        try {
-            cursor = db.query(TABLE_USERS, new String[]{COLUMN_ID}, COLUMN_EMAIL + "=? AND " + COLUMN_PASSWORD + "=?",
-                    new String[]{email, password}, null, null, null);
-            return cursor != null && cursor.getCount() > 0;
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-    }
-
-    // Validate User Login and Return User ID
     public int validateUser(String email, String password) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = null;
         int userId = -1; // Default: user not found
-        try {
-            cursor = db.query(TABLE_USERS, new String[]{COLUMN_ID},
-                    COLUMN_EMAIL + "=? AND " + COLUMN_PASSWORD + "=?",
-                    new String[]{email, password}, null, null, null);
+
+        try (Cursor cursor = db.query(TABLE_USERS, new String[]{COLUMN_ID},
+                COLUMN_EMAIL + "=? AND " + COLUMN_PASSWORD + "=?",
+                new String[]{email, password}, null, null, null)) {
             if (cursor != null && cursor.moveToFirst()) {
                 userId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID));
             }
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
         }
         return userId;
-    }
-
-    // Insert Water Intake Log
-    public boolean insertWaterLog(String email, String date, int amount) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_EMAIL, email);
-        values.put(COLUMN_DATE, date);
-        values.put(COLUMN_AMOUNT, amount);
-
-        long result = db.insert(TABLE_WATER_LOGS, null, values);
-        return result != -1;
-    }
-
-    // Get Daily Water Intake
-    public int getDailyWaterIntake(String email, String date) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = null;
-        int total = 0;
-        try {
-            cursor = db.rawQuery("SELECT SUM(" + COLUMN_AMOUNT + ") FROM " + TABLE_WATER_LOGS + " WHERE "
-                    + COLUMN_EMAIL + "=? AND " + COLUMN_DATE + "= ?", new String[]{email, date});
-
-            if (cursor != null && cursor.moveToFirst()) {
-                total = cursor.getInt(0);
-            }
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-        return total;
-    }
-
-    // Get Weekly Water Intake
-    public Cursor getWeeklyWaterIntake(String email) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        return db.rawQuery("SELECT " + COLUMN_DATE + ", SUM(" + COLUMN_AMOUNT + ") AS total FROM " + TABLE_WATER_LOGS
-                        + " WHERE " + COLUMN_EMAIL + "=? GROUP BY " + COLUMN_DATE + " ORDER BY " + COLUMN_DATE + " DESC LIMIT 7",
-                new String[]{email});
-    }
-
-    // Add this method to DatabaseHelper
-    public int getDailyGoal(String email) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        int dailyGoal = 2000; // Default goal
-
-        Cursor cursor = null;
-        try {
-            cursor = db.query(TABLE_USERS, new String[]{COLUMN_DAILY_GOAL},
-                    COLUMN_EMAIL + "=?", new String[]{email}, null, null, null);
-
-            if (cursor != null && cursor.moveToFirst()) {
-                dailyGoal = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_DAILY_GOAL));
-            }
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-
-        return dailyGoal;
-    }
-
-    public List<String> getWeeklyHistory(String email) {
-        List<String> history = new ArrayList<>();
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = null;
-
-        try {
-            // Query to fetch weekly water intake history
-            cursor = db.rawQuery(
-                    "SELECT " + COLUMN_DATE + ", SUM(" + COLUMN_AMOUNT + ") AS total " +
-                            "FROM " + TABLE_WATER_LOGS + " WHERE " + COLUMN_EMAIL + " = ? " +
-                            "GROUP BY " + COLUMN_DATE + " ORDER BY " + COLUMN_DATE + " DESC LIMIT 7",
-                    new String[]{email}
-            );
-
-            // Process query results
-            if (cursor != null) {
-                while (cursor.moveToNext()) {
-                    String date = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DATE));
-                    int total = cursor.getInt(cursor.getColumnIndexOrThrow("total"));
-                    history.add(date + ": " + total + " ml");
-                }
-            }
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-
-        return history;
-    }
-
-    public int getReminderInterval(String email) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        int interval = 60; // Default reminder interval in minutes
-
-        Cursor cursor = null;
-        try {
-            cursor = db.query(TABLE_USERS, new String[]{COLUMN_REMINDER_INTERVAL},
-                    COLUMN_EMAIL + "=?", new String[]{email}, null, null, null);
-
-            if (cursor != null && cursor.moveToFirst()) {
-                interval = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_REMINDER_INTERVAL));
-            }
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-
-        return interval;
     }
 
     public boolean updateUserSettings(String email, int dailyGoal, int reminderInterval) {
@@ -250,27 +115,91 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public String getUserEmailById(int userId) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = null;
         String email = null;
 
-        try {
-            cursor = db.query(TABLE_USERS, new String[]{COLUMN_EMAIL},
-                    COLUMN_ID + "=?", new String[]{String.valueOf(userId)},
-                    null, null, null);
-
+        try (Cursor cursor = db.query(TABLE_USERS, new String[]{COLUMN_EMAIL},
+                COLUMN_ID + "=?", new String[]{String.valueOf(userId)},
+                null, null, null)) {
             if (cursor != null && cursor.moveToFirst()) {
                 email = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EMAIL));
             }
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
         }
-
         return email;
     }
 
-    // Save Notification Times
+    // ====================== Water Logs Management ====================== //
+
+    public boolean insertWaterLog(String email, String date, int amount) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_EMAIL, email);
+        values.put(COLUMN_DATE, date);
+        values.put(COLUMN_AMOUNT, amount);
+
+        long result = db.insert(TABLE_WATER_LOGS, null, values);
+        return result != -1;
+    }
+
+    public int getDailyWaterIntake(String email, String date) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        int total = 0;
+
+        try (Cursor cursor = db.rawQuery("SELECT SUM(" + COLUMN_AMOUNT + ") FROM " + TABLE_WATER_LOGS +
+                " WHERE " + COLUMN_EMAIL + "=? AND " + COLUMN_DATE + "=?", new String[]{email, date})) {
+            if (cursor != null && cursor.moveToFirst()) {
+                total = cursor.getInt(0);
+            }
+        }
+        return total;
+    }
+
+    public List<String> getWeeklyHistory(String email) {
+        List<String> history = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        try (Cursor cursor = db.rawQuery(
+                "SELECT " + COLUMN_DATE + ", SUM(" + COLUMN_AMOUNT + ") AS total " +
+                        "FROM " + TABLE_WATER_LOGS +
+                        " WHERE " + COLUMN_EMAIL + " = ? " +
+                        "GROUP BY " + COLUMN_DATE +
+                        " ORDER BY " + COLUMN_DATE + " DESC LIMIT 7",
+                new String[]{email})) {
+
+            while (cursor.moveToNext()) {
+                String date = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DATE));
+                int total = cursor.getInt(cursor.getColumnIndexOrThrow("total"));
+                history.add(date + ": " + total + " ml");
+            }
+        }
+        return history;
+    }
+
+    public Cursor getWeeklyWaterIntake(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery(
+                "SELECT " + COLUMN_DATE + ", SUM(" + COLUMN_AMOUNT + ") AS total " +
+                        "FROM " + TABLE_WATER_LOGS +
+                        " WHERE " + COLUMN_EMAIL + "=? " +
+                        "GROUP BY " + COLUMN_DATE +
+                        " ORDER BY " + COLUMN_DATE + " DESC LIMIT 7",
+                new String[]{email});
+    }
+
+    public int getDailyGoal(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        int dailyGoal = 2000; // Default goal
+
+        try (Cursor cursor = db.query(TABLE_USERS, new String[]{COLUMN_DAILY_GOAL},
+                COLUMN_EMAIL + "=?", new String[]{email}, null, null, null)) {
+            if (cursor != null && cursor.moveToFirst()) {
+                dailyGoal = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_DAILY_GOAL));
+            }
+        }
+        return dailyGoal;
+    }
+
+    // ====================== Notification Settings ====================== //
+
     public boolean saveNotificationTimes(String email, int wakeUpHour, int wakeUpMinute, int bedTimeHour, int bedTimeMinute) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -282,4 +211,50 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         int rows = db.update(TABLE_USERS, values, COLUMN_EMAIL + "=?", new String[]{email});
         return rows > 0;
     }
+
+    public int getReminderInterval(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        int interval = 60; // Default reminder interval
+
+        try (Cursor cursor = db.query(TABLE_USERS, new String[]{COLUMN_REMINDER_INTERVAL},
+                COLUMN_EMAIL + "=?", new String[]{email}, null, null, null)) {
+            if (cursor != null && cursor.moveToFirst()) {
+                interval = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_REMINDER_INTERVAL));
+            }
+        }
+        return interval;
+    }
+
+    // Add this method to the DatabaseHelper class
+    public List<String> getDailyHistory(String email) {
+        List<String> history = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+
+        try {
+            // Query to fetch the last 7 days' water intake
+            String query = "SELECT " + COLUMN_DATE + ", SUM(" + COLUMN_AMOUNT + ") AS total " +
+                    "FROM " + TABLE_WATER_LOGS + " " +
+                    "WHERE " + COLUMN_EMAIL + " = ? " +
+                    "GROUP BY " + COLUMN_DATE + " " +
+                    "ORDER BY " + COLUMN_DATE + " DESC " +
+                    "LIMIT 7";
+
+            cursor = db.rawQuery(query, new String[]{email});
+
+            // Process query results
+            while (cursor != null && cursor.moveToNext()) {
+                String date = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DATE));
+                int total = cursor.getInt(cursor.getColumnIndexOrThrow("total"));
+                history.add(date + ": " + total + " ml");
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+
+        return history;
+    }
+
 }
