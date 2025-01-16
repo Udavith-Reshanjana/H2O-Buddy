@@ -1,8 +1,8 @@
 package com.example.h2obuddy;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -15,8 +15,6 @@ public class HomeActivity extends AppCompatActivity {
     private TextView tvDailyGoal;
     private TextView tvProgress;
     private ProgressBar progressBar;
-    private Button btnAdd250;
-    private Button btnAdd500;
 
     private int dailyGoal = 2000; // Default daily goal in ml
     private int currentIntake = 0; // Tracks the current water intake
@@ -33,8 +31,6 @@ public class HomeActivity extends AppCompatActivity {
         tvDailyGoal = findViewById(R.id.tvDailyGoal);
         tvProgress = findViewById(R.id.tvProgress);
         progressBar = findViewById(R.id.progressBar);
-        btnAdd250 = findViewById(R.id.btnAdd250);
-        btnAdd500 = findViewById(R.id.btnAdd500);
 
         // Initialize DatabaseHelper
         databaseHelper = new DatabaseHelper();
@@ -44,21 +40,6 @@ public class HomeActivity extends AppCompatActivity {
 
         // Load user data from database
         loadUserData();
-
-        // Set button click listeners
-        btnAdd250.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addWaterIntake(250);
-            }
-        });
-
-        btnAdd500.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addWaterIntake(500);
-            }
-        });
     }
 
     private void loadUserData() {
@@ -99,9 +80,34 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void updateUI() {
+        tvDailyGoal.setText("Daily Goal: " + dailyGoal + " ml");
         tvProgress.setText("Progress: " + currentIntake + " / " + dailyGoal + " ml");
         progressBar.setMax(100); // Ensure progressBar max value is set to 100
         progressBar.setProgress((currentIntake * 100) / dailyGoal); // Update progress
+    }
+
+    public void addWaterIntake250(View view) {
+        addWaterIntake(250);
+    }
+
+    public void addWaterIntake500(View view) {
+        addWaterIntake(500);
+    }
+
+    public void gotoSettings(View view) {
+        Intent intent = new Intent(this, SettingActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putInt("USER_ID", userId);
+        intent.putExtras(bundle);
+        startActivity(intent);
+    }
+
+    public void gotoHistory(View view) {
+        Intent intent = new Intent(this, HistoryActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putInt("USER_ID", userId);
+        intent.putExtras(bundle);
+        startActivity(intent);
     }
 
     private class DatabaseHelper {
@@ -124,16 +130,6 @@ public class HomeActivity extends AppCompatActivity {
                 return true;
             }
             return false;
-        }
-
-        public int validateUser(String email, String password) {
-            for (Map.Entry<Integer, User> entry : users.entrySet()) {
-                User user = entry.getValue();
-                if (user.email.equals(email) && user.password.equals(password)) {
-                    return entry.getKey();
-                }
-            }
-            return -1;
         }
     }
 
