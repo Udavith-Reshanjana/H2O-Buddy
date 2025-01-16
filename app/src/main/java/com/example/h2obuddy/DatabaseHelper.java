@@ -29,6 +29,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_NAME = "name";
     private static final String COLUMN_DAILY_GOAL = "daily_goal";
     private static final String COLUMN_REMINDER_INTERVAL = "reminder_interval";
+    private static final String COLUMN_WAKE_UP_HOUR = "wake_up_hour";
+    private static final String COLUMN_WAKE_UP_MINUTE = "wake_up_minute";
+    private static final String COLUMN_BED_TIME_HOUR = "bed_time_hour";
+    private static final String COLUMN_BED_TIME_MINUTE = "bed_time_minute";
 
     // Water Logs Table Columns
     private static final String COLUMN_DATE = "date";
@@ -47,7 +51,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + COLUMN_PASSWORD + " TEXT, "
                 + COLUMN_NAME + " TEXT, "
                 + COLUMN_DAILY_GOAL + " INTEGER DEFAULT 2000, "
-                + COLUMN_REMINDER_INTERVAL + " INTEGER DEFAULT 60)";
+                + COLUMN_REMINDER_INTERVAL + " INTEGER DEFAULT 60, "
+                + COLUMN_WAKE_UP_HOUR + " INTEGER DEFAULT 6, "
+                + COLUMN_WAKE_UP_MINUTE + " INTEGER DEFAULT 0, "
+                + COLUMN_BED_TIME_HOUR + " INTEGER DEFAULT 22, "
+                + COLUMN_BED_TIME_MINUTE + " INTEGER DEFAULT 0)";
         db.execSQL(CREATE_USERS_TABLE);
 
         // Create Water Logs Table
@@ -115,7 +123,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return userId;
     }
-
 
     // Insert Water Intake Log
     public boolean insertWaterLog(String email, String date, int amount) {
@@ -263,4 +270,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return email;
     }
 
+    // Save Notification Times
+    public boolean saveNotificationTimes(String email, int wakeUpHour, int wakeUpMinute, int bedTimeHour, int bedTimeMinute) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_WAKE_UP_HOUR, wakeUpHour);
+        values.put(COLUMN_WAKE_UP_MINUTE, wakeUpMinute);
+        values.put(COLUMN_BED_TIME_HOUR, bedTimeHour);
+        values.put(COLUMN_BED_TIME_MINUTE, bedTimeMinute);
+
+        int rows = db.update(TABLE_USERS, values, COLUMN_EMAIL + "=?", new String[]{email});
+        return rows > 0;
+    }
 }

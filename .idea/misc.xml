@@ -3,9 +3,23 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/lenovo/Documents/GitHub/H2O-Buddy/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.1945" />
+        <entry key="..\:/Users/lenovo/Documents/GitHub/H2O-Buddy/app/src/main/res/drawable/circle_shape.xml" value="0.1945" />
+        <entry key="..\:/Users/lenovo/Documents/GitHub/H2O-Buddy/app/src/main/res/drawable/circular_progress_bar.xml" value="0.1945" />
+        <entry key="..\:/Users/lenovo/Documents/GitHub/H2O-Buddy/app/src/main/res/drawable/ic_baseline_access_alarm_24.xml" value="0.1945" />
+        <entry key="..\:/Users/lenovo/Documents/GitHub/H2O-Buddy/app/src/main/res/drawable/ic_baseline_add_24.xml" value="0.1945" />
+        <entry key="..\:/Users/lenovo/Documents/GitHub/H2O-Buddy/app/src/main/res/drawable/ic_baseline_add_circle_outline_24.xml" value="0.1945" />
+        <entry key="..\:/Users/lenovo/Documents/GitHub/H2O-Buddy/app/src/main/res/drawable/ic_baseline_home_24.xml" value="0.1945" />
+        <entry key="..\:/Users/lenovo/Documents/GitHub/H2O-Buddy/app/src/main/res/drawable/ic_baseline_local_drink_24.xml" value="0.1945" />
+        <entry key="..\:/Users/lenovo/Documents/GitHub/H2O-Buddy/app/src/main/res/drawable/ic_baseline_notifications_24.xml" value="0.1945" />
+        <entry key="..\:/Users/lenovo/Documents/GitHub/H2O-Buddy/app/src/main/res/drawable/ic_baseline_settings_24.xml" value="0.1945" />
+        <entry key="..\:/Users/lenovo/Documents/GitHub/H2O-Buddy/app/src/main/res/drawable/ic_clock_foreground.xml" value="0.1945" />
+        <entry key="..\:/Users/lenovo/Documents/GitHub/H2O-Buddy/app/src/main/res/drawable/ic_edit.xml" value="0.1945" />
+        <entry key="..\:/Users/lenovo/Documents/GitHub/H2O-Buddy/app/src/main/res/drawable/ic_launcher_background.xml" value="0.1945" />
         <entry key="..\:/Users/lenovo/Documents/GitHub/H2O-Buddy/app/src/main/res/layout/activity_history.xml" value="0.2" />
         <entry key="..\:/Users/lenovo/Documents/GitHub/H2O-Buddy/app/src/main/res/layout/activity_home.xml" value="0.22" />
         <entry key="..\:/Users/lenovo/Documents/GitHub/H2O-Buddy/app/src/main/res/layout/activity_main.xml" value="0.1859375" />
+        <entry key="..\:/Users/lenovo/Documents/GitHub/H2O-Buddy/app/src/main/res/layout/activity_notification.xml" value="0.2" />
         <entry key="..\:/Users/lenovo/Documents/GitHub/H2O-Buddy/app/src/main/res/layout/activity_setting.xml" value="0.2" />
         <entry key="..\:/Users/lenovo/Documents/GitHub/H2O-Buddy/app/src/main/res/layout/activity_signup.xml" value="0.1859375" />
       </map>
