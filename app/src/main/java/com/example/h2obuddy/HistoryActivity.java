@@ -31,10 +31,10 @@ public class HistoryActivity extends AppCompatActivity {
             return;
         }
 
-        loadWeeklyHistory();
+        loadDailyHistory();
     }
 
-    private void loadWeeklyHistory() {
+    private void loadDailyHistory() {
         // Get user email by ID
         String userEmail = databaseHelper.getUserEmailById(userId);
         if (userEmail == null) {
@@ -43,17 +43,17 @@ public class HistoryActivity extends AppCompatActivity {
             return;
         }
 
-        // Fetch weekly history from the database
-        List<String> history = databaseHelper.getWeeklyHistory(userEmail);
+        // Fetch daily history for the last 7 days from the database
+        List<String> dailyHistory = databaseHelper.getDailyHistory(userEmail);
 
-        if (history.isEmpty()) {
+        if (dailyHistory.isEmpty()) {
             Toast.makeText(this, "No history available", Toast.LENGTH_SHORT).show();
             return;
         }
 
         // Create an adapter to display the history
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_list_item_1, highlightSuccessfulDays(history, userEmail));
+                android.R.layout.simple_list_item_1, highlightSuccessfulDays(dailyHistory, userEmail));
         lvHistory.setAdapter(adapter);
     }
 
