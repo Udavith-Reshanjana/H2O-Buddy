@@ -14,10 +14,10 @@
         android:theme="@style/Theme.H2OBuddy"
         tools:targetApi="31">
         <activity
-            android:name=".SettingActivity"
+            android:name=".HistoryActivity"
             android:exported="false" />
         <activity
-            android:name=".HistoryActivity"
+            android:name=".SettingActivity"
             android:exported="false" />
         <activity
             android:name=".SignupActivity"
