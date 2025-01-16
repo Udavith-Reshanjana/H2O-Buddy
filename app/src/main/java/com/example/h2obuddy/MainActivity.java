@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
 
                     // Pass user ID to HomeActivity
-                    Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+                    Intent intent = new Intent(MainActivity.this, NotificationActivity.class);
                     Bundle bundle = new Bundle();
                     bundle.putInt("USER_ID", userId);
                     intent.putExtras(bundle);
