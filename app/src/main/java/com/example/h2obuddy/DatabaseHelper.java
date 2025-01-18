@@ -291,11 +291,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return totalIntake;
     }
 
-
-
-
-    // test run support
-
     public List<String> getDailyHistory(String email) {
         List<String> history = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
