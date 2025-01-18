@@ -12,30 +12,44 @@
         android:id="@+id/tvNotificationSettings"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Smart Notifications"
+        android:text="Notification Settings"
         android:textSize="18sp"
         android:textStyle="bold"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:id="@+id/tvWakeUpTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Wake-Up Time"
+        android:layout_marginBottom="8dp" />
 
     <TimePicker
         android:id="@+id/tpWakeUpTime"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:timePickerMode="spinner"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:id="@+id/tvBedTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Bed Time"
+        android:layout_marginBottom="8dp" />
 
     <TimePicker
         android:id="@+id/tpBedTime"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:timePickerMode="spinner"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginBottom="16dp" />
 
     <Button
         android:id="@+id/btnSaveNotifications"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Save Notifications"
-        android:onClick="gotoHome"/>
+        android:text="Save Notification Settings"
+        android:onClick="saveNotificationSettings" />
 
 </LinearLayout>

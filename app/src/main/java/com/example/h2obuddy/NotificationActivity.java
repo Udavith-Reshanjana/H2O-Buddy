@@ -1,7 +1,9 @@
 package com.example.h2obuddy;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TimePicker;
@@ -12,22 +14,23 @@ public class NotificationActivity extends AppCompatActivity {
     private TimePicker tpWakeUpTime;
     private TimePicker tpBedTime;
     private DatabaseHelper databaseHelper;
-    private int userId;
+    private int userId = -1;
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notification);
 
-        // Initialize views
+        // Initialize TimePickers
         tpWakeUpTime = findViewById(R.id.tpWakeUpTime);
         tpBedTime = findViewById(R.id.tpBedTime);
 
         // Initialize DatabaseHelper
         databaseHelper = new DatabaseHelper(this);
 
-        // Retrieve user ID from intent
-        userId = getIntent().getExtras().getInt("USER_ID", -1);
+        // Retrieve user ID from Intent
+        userId = getIntent().getIntExtra("USER_ID", -1);
 
         if (userId == -1) {
             Toast.makeText(this, "User ID not found", Toast.LENGTH_SHORT).show();
@@ -35,11 +38,13 @@ public class NotificationActivity extends AppCompatActivity {
             return;
         }
 
-        // Optionally, load existing notification preferences
+        // Load existing notification settings if required (optional)
         loadNotificationSettings();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     private void loadNotificationSettings() {
+        // Get the user's email using their user ID
         String userEmail = databaseHelper.getUserEmailById(userId);
         if (userEmail == null) {
             Toast.makeText(this, "User not found", Toast.LENGTH_SHORT).show();
@@ -47,33 +52,40 @@ public class NotificationActivity extends AppCompatActivity {
             return;
         }
 
-        // Load and set existing notification times (if stored in database)
-        // This example assumes a method `getNotificationTimes` in DatabaseHelper to fetch the times.
-        // You'll need to implement it in your DatabaseHelper, if necessary.
-        // For now, this example skips loading to focus on saving functionality.
+        // Load notification settings
+        DatabaseHelper.NotificationSettings settings = databaseHelper.getNotificationSettings(userEmail);
+
+        if (settings != null) {
+            tpWakeUpTime.setHour(settings.wakeUpHour);
+            tpWakeUpTime.setMinute(settings.wakeUpMinute);
+            tpBedTime.setHour(settings.bedTimeHour);
+            tpBedTime.setMinute(settings.bedTimeMinute);
+        }
     }
 
-    public void gotoHome(View view) {
-        // Get wake-up and bedtime from TimePickers
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    public void saveNotificationSettings(View view) {
+        // Get the wake-up and bedtimes from the TimePickers
         int wakeUpHour = tpWakeUpTime.getHour();
         int wakeUpMinute = tpWakeUpTime.getMinute();
         int bedTimeHour = tpBedTime.getHour();
         int bedTimeMinute = tpBedTime.getMinute();
 
-        // Save notification preferences to the database
+        // Get the user's email using their user ID
         String userEmail = databaseHelper.getUserEmailById(userId);
         if (userEmail == null) {
             Toast.makeText(this, "User not found", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Example of saving the times (you need to implement `saveNotificationTimes` in DatabaseHelper)
+        // Save the notification settings to the database
         boolean success = databaseHelper.saveNotificationTimes(userEmail, wakeUpHour, wakeUpMinute, bedTimeHour, bedTimeMinute);
 
         if (success) {
+            // Display a success message and navigate to the home screen
             Toast.makeText(this, "Notification settings saved successfully", Toast.LENGTH_SHORT).show();
 
-            // Pass the user ID to HomeActivity
+            // Navigate to the home screen and pass the user ID
             Intent intent = new Intent(this, HomeActivity.class);
             Bundle bundle = new Bundle();
             bundle.putInt("USER_ID", userId);
@@ -81,6 +93,7 @@ public class NotificationActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         } else {
+            // Display an error message
             Toast.makeText(this, "Failed to save notification settings", Toast.LENGTH_SHORT).show();
         }
     }

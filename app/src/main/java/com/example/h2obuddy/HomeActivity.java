@@ -7,8 +7,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import java.util.HashMap;
-import java.util.Map;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -33,47 +31,50 @@ public class HomeActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
 
         // Initialize DatabaseHelper
-        databaseHelper = new DatabaseHelper();
+        databaseHelper = new DatabaseHelper(this);
 
         // Get user ID from intent extras
         userId = getIntent().getExtras().getInt("USER_ID", -1);
 
-        // Load user data from database
-        loadUserData();
-    }
-
-    private void loadUserData() {
         if (userId == -1) {
             Toast.makeText(this, "User ID not found", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
 
-        // Fetch user data from the database
-        User user = databaseHelper.getUserById(userId);
-        if (user != null) {
-            dailyGoal = user.dailyGoal;
-            currentIntake = user.currentIntake;
-            updateUI();
-        } else {
-            Toast.makeText(this, "User not found in database", Toast.LENGTH_SHORT).show();
+        // Load user data from the database
+        loadUserData();
+    }
+
+    private void loadUserData() {
+        // Fetch user details from the database
+        String userEmail = databaseHelper.getUserEmailById(userId);
+        if (userEmail == null) {
+            Toast.makeText(this, "User not found", Toast.LENGTH_SHORT).show();
             finish();
+            return;
         }
+
+        dailyGoal = databaseHelper.getDailyGoal(userEmail);
+        currentIntake = databaseHelper.getDailyWaterIntake(userEmail, getCurrentDate());
+        updateUI();
     }
 
     private void addWaterIntake(int amount) {
+        // Update water intake
         currentIntake += amount;
 
-        // Ensure intake doesn't exceed daily goal
+        // Ensure intake doesn't exceed the daily goal
         if (currentIntake > dailyGoal) {
             currentIntake = dailyGoal;
         }
 
         // Save updated intake to the database
-        boolean success = databaseHelper.updateUserIntake(userId, currentIntake);
+        String userEmail = databaseHelper.getUserEmailById(userId);
+        boolean success = databaseHelper.insertWaterLog(userEmail, getCurrentDate(), amount);
 
         if (success) {
-            updateUI(); // Update UI with the new values
+            updateUI(); // Refresh UI with the updated values
         } else {
             Toast.makeText(this, "Failed to update water intake", Toast.LENGTH_SHORT).show();
         }
@@ -82,8 +83,8 @@ public class HomeActivity extends AppCompatActivity {
     private void updateUI() {
         tvDailyGoal.setText("Daily Goal: " + dailyGoal + " ml");
         tvProgress.setText("Progress: " + currentIntake + " / " + dailyGoal + " ml");
-        progressBar.setMax(100); // Ensure progressBar max value is set to 100
-        progressBar.setProgress((currentIntake * 100) / dailyGoal); // Update progress
+        progressBar.setMax(dailyGoal);
+        progressBar.setProgress(currentIntake);
     }
 
     public void addWaterIntake250(View view) {
@@ -96,56 +97,19 @@ public class HomeActivity extends AppCompatActivity {
 
     public void gotoSettings(View view) {
         Intent intent = new Intent(this, SettingActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putInt("USER_ID", userId);
-        intent.putExtras(bundle);
+        intent.putExtra("USER_ID", userId);
         startActivity(intent);
     }
 
     public void gotoHistory(View view) {
         Intent intent = new Intent(this, HistoryActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putInt("USER_ID", userId);
-        intent.putExtras(bundle);
+        intent.putExtra("USER_ID", userId);
         startActivity(intent);
     }
 
-    private class DatabaseHelper {
-
-        private Map<Integer, User> users = new HashMap<>();
-
-        public DatabaseHelper() {
-            users.put(1, new User(1, "test@example.com", "password123", 2000, 0));
-            users.put(2, new User(2, "user2@example.com", "pass456", 2500, 500));
-        }
-
-        public User getUserById(int userId) {
-            return users.get(userId);
-        }
-
-        public boolean updateUserIntake(int userId, int intake) {
-            User user = users.get(userId);
-            if (user != null) {
-                user.currentIntake = intake;
-                return true;
-            }
-            return false;
-        }
-    }
-
-    private static class User {
-        int id;
-        String email;
-        String password;
-        int dailyGoal;
-        int currentIntake;
-
-        public User(int id, String email, String password, int dailyGoal, int currentIntake) {
-            this.id = id;
-            this.email = email;
-            this.password = password;
-            this.dailyGoal = dailyGoal;
-            this.currentIntake = currentIntake;
-        }
+    private String getCurrentDate() {
+        // Returns the current date in YYYY-MM-DD format
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault());
+        return sdf.format(new java.util.Date());
     }
 }
